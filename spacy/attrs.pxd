@@ -88,6 +88,8 @@ cdef enum attr_id_t:
     SENT_START
     SPACY
     PROB
+    IS_DOC_START
+    IS_DOC_END
 
     LANG
     ENT_KB_ID = symbols.ENT_KB_ID

@@ -127,8 +127,7 @@ cdef class Matcher:
         key = self._normalize_key(key)
         for pattern in patterns:
             try:
-                specs = _preprocess_pattern(pattern, self.vocab,
-                    self._extensions, self._extra_predicates)
+                specs = _preprocess_pattern(pattern, self.vocab, self._extensions, self._extra_predicates)
                 self.patterns.push_back(init_pattern(self.mem, key, specs))
                 for spec in specs:
                     for attr, _ in spec[1]:
@@ -252,8 +251,8 @@ cdef class Matcher:
         if self.patterns.empty():
             matches = []
         else:
-            matches = find_matches(&self.patterns[0], self.patterns.size(), doclike, length,
-                                    extensions=self._extensions, predicates=self._extra_predicates, with_alignments=with_alignments)
+            matches = find_matches(&self.patterns[0], self.patterns.size(), doclike, length, extensions=self._extensions,
+                                   predicates=self._extra_predicates, with_alignments=with_alignments)
         final_matches = []
         pairs_by_id = {}
         # For each key, either add all matches, or only the filtered,
@@ -771,6 +770,7 @@ def _preprocess_pattern(token_specs, vocab, extensions_table, extra_predicates):
     """
     tokens = []
     string_store = vocab.strings
+    print(len(token_specs))
     for token_idx, spec in enumerate(token_specs):
         if not spec:
             # Signifier for 'any token'
