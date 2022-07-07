@@ -119,6 +119,8 @@ class Token:
     sent_start: bool
     is_sent_start: Optional[bool]
     is_sent_end: Optional[bool]
+    is_doc_start: Optional[bool]
+    is_doc_end: Optional[bool]
     @property
     def lefts(self) -> Iterator[Token]: ...
     @property

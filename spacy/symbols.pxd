@@ -85,6 +85,8 @@ cdef enum symbol_t:
     SENT_START
     SPACY
     PROB
+    IS_DOC_START #83
+    IS_DOC_END
     LANG
 
     ADJ

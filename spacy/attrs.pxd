@@ -88,7 +88,7 @@ cdef enum attr_id_t:
     SENT_START
     SPACY
     PROB
-    IS_DOC_START
+    IS_DOC_START #83
     IS_DOC_END
 
     LANG

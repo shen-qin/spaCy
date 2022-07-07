@@ -90,6 +90,8 @@ IDS = {
     "PROB": PROB,
     "LANG": LANG,
     "IDX": IDX,
+    "IS_DOC_START": IS_DOC_START,
+    "IS_DOC_END": IS_DOC_END,
 
     "ADJ": ADJ,
     "ADP": ADP,
