@@ -63,10 +63,6 @@ cdef class Token:
             return token.ent_kb_id
         elif feat_name == SENT_START:
             return token.sent_start
-        elif feat_name == IS_DOC_START:
-            return token.is_doc_start
-        elif feat_name == IS_DOC_END:
-            return token.is_doc_end
         else:
             return Lexeme.get_struct_attr(token.lex, feat_name)
 
@@ -99,7 +95,6 @@ cdef class Token:
             token.ent_kb_id = value
         elif feat_name == SENT_START:
             token.sent_start = value
-
 
     @staticmethod
     cdef inline int missing_dep(const TokenC* token) nogil:

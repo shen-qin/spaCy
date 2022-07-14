@@ -378,7 +378,7 @@ cdef find_matches(TokenPatternC** patterns, int n, object doclike, int length, e
         if with_alignments != 0:
             align_states.resize(states.size())
         transition_states(states, matches, align_states, align_matches, predicate_cache,
-            doclike[i], extra_attr_values, predicates, with_alignments)
+            doclike[i], extra_attr_values, predicates, with_alignments, i, length-1)
         extra_attr_values += nr_extra_attr
         predicate_cache += len(predicates)
     # Handle matches that end in 0-width patterns
@@ -407,7 +407,7 @@ cdef find_matches(TokenPatternC** patterns, int n, object doclike, int length, e
 cdef void transition_states(vector[PatternStateC]& states, vector[MatchC]& matches,
                             vector[vector[MatchAlignmentC]]& align_states, vector[vector[MatchAlignmentC]]& align_matches,
                             int8_t* cached_py_predicates,
-        Token token, const attr_t* extra_attrs, py_predicates, bint with_alignments) except *:
+        Token token, const attr_t* extra_attrs, py_predicates, bint with_alignments, int idx, int final_idx) except *:
     cdef int q = 0
     cdef vector[PatternStateC] new_states
     cdef vector[vector[MatchAlignmentC]] align_new_states
@@ -417,7 +417,7 @@ cdef void transition_states(vector[PatternStateC]& states, vector[MatchC]& match
             update_predicate_cache(cached_py_predicates,
                 states[i].pattern, token, py_predicates)
         action = get_action(states[i], token.c, extra_attrs,
-                            cached_py_predicates)
+                            cached_py_predicates, idx, final_idx)
         if action == REJECT:
             continue
         # Keep only a subset of states (the active ones). Index q is the
@@ -454,7 +454,7 @@ cdef void transition_states(vector[PatternStateC]& states, vector[MatchC]& match
                 update_predicate_cache(cached_py_predicates,
                     states[q].pattern, token, py_predicates)
             action = get_action(states[q], token.c, extra_attrs,
-                                cached_py_predicates)
+                                cached_py_predicates, idx, final_idx)
         # Update alignment before the transition of current state
         if with_alignments != 0:
             align_states[q].push_back(MatchAlignmentC(states[q].pattern.token_idx, states[q].length))
@@ -566,7 +566,7 @@ cdef void finish_states(vector[MatchC]& matches, vector[PatternStateC]& states,
 
 cdef action_t get_action(PatternStateC state,
         const TokenC* token, const attr_t* extra_attrs,
-        const int8_t* predicate_matches) nogil:
+        const int8_t* predicate_matches, int idx, int final_idx) nogil:
     """We need to consider:
     a) Does the token match the specification? [Yes, No]
     b) What's the quantifier? [1, 0+, ?]
@@ -625,7 +625,7 @@ cdef action_t get_action(PatternStateC state,
     Problem: If a quantifier is matching, we're adding a lot of open partials
     """
     cdef int8_t is_match
-    is_match = get_is_match(state, token, extra_attrs, predicate_matches)
+    is_match = get_is_match(state, token, extra_attrs, predicate_matches, idx, final_idx)
     quantifier = get_quantifier(state)
     is_final = get_is_final(state)
     if quantifier == ZERO:
@@ -678,18 +678,29 @@ cdef action_t get_action(PatternStateC state,
 
 cdef int8_t get_is_match(PatternStateC state,
         const TokenC* token, const attr_t* extra_attrs,
-        const int8_t* predicate_matches) nogil:
+        const int8_t* predicate_matches, int idx, int final_idx) nogil:
     for i in range(state.pattern.nr_py):
         if predicate_matches[state.pattern.py_predicates[i]] == -1:
             return 0
+    with gil:
+        print("predicate matches passed")
     spec = state.pattern
     if spec.nr_attr > 0:
         for attr in spec.attrs[:spec.nr_attr]:
-            if get_token_attr_for_matcher(token, attr.attr) != attr.value:
+
+            # with gil:
+            #     print("SPEC.NR_ATTR", spec.nr_attr)
+            #     print("get_token_attr_for_matcher",get_token_attr_for_matcher(token, attr.attr))
+            #     print("attr.value", attr.value)
+            if get_token_attr_for_matcher(token, attr.attr, idx, final_idx) != attr.value:
                 return 0
+    with gil:
+        print("get_token_attr_for_matcher passed")
     for i in range(spec.nr_extra_attr):
         if spec.extra_attrs[i].value != extra_attrs[spec.extra_attrs[i].index]:
             return 0
+    with gil:
+        print("extra_attrs passed")
     return True
 
 
@@ -770,7 +781,7 @@ def _preprocess_pattern(token_specs, vocab, extensions_table, extra_predicates):
     """
     tokens = []
     string_store = vocab.strings
-    print(len(token_specs))
+    # print(len(token_specs))
     for token_idx, spec in enumerate(token_specs):
         if not spec:
             # Signifier for 'any token'

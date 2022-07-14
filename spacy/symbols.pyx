@@ -90,8 +90,6 @@ IDS = {
     "PROB": PROB,
     "LANG": LANG,
     "IDX": IDX,
-    "IS_DOC_START": IS_DOC_START,
-    "IS_DOC_END": IS_DOC_END,
 
     "ADJ": ADJ,
     "ADP": ADP,
@@ -468,6 +466,8 @@ IDS = {
     "LAW": LAW,
     "MORPH": MORPH,
     "_": _,
+    "IS_FIRST_TOKEN": IS_FIRST_TOKEN,
+    "IS_LAST_TOKEN": IS_LAST_TOKEN,
 }
 
 

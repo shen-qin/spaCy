@@ -14,7 +14,6 @@ from ..attrs cimport IS_ALPHA, IS_ASCII, IS_DIGIT, IS_LOWER, IS_PUNCT, IS_SPACE
 from ..attrs cimport IS_BRACKET, IS_QUOTE, IS_LEFT_PUNCT, IS_RIGHT_PUNCT
 from ..attrs cimport IS_TITLE, IS_UPPER, IS_CURRENCY, IS_STOP
 from ..attrs cimport LIKE_URL, LIKE_NUM, LIKE_EMAIL
-from ..attrs cimport IS_DOC_START, IS_DOC_END
 from ..symbols cimport conj
 from .morphanalysis cimport MorphAnalysis
 from .doc cimport set_children_from_heads
@@ -215,7 +214,7 @@ cdef class Token:
         result = xp.dot(vector, other.vector) / (self.vector_norm * other.vector_norm)
         # ensure we get a scalar back (numpy does this automatically but cupy doesn't)
         return result.item()
-    
+
     def has_morph(self):
         """Check whether the token has annotated morph information.
         Return False when the morph annotation is unset/missing.
@@ -531,29 +530,6 @@ cdef class Token:
 
         def __set__(self, value):
             raise ValueError(Errors.E196)
-
-    property is_doc_start:
-        """A boolean value indicating whether the token starts a 'Doc'.
-        
-        RETURNS (bool): Whether the token starts a 'Doc'.
-        """
-        def __get__(self):
-            if self.c.sent_start > 0:
-                return True
-            else:
-                return False
-
-
-    property is_doc_end:
-        """A boolean value indicating whether the token ends a 'Doc'.
-
-        RETURNS (bool): Whether the token ends a 'Doc'.
-        """
-        def __get__(self):
-            if self.i + 1 == len(self.doc):
-                return True
-            else:
-                return False
 
     @property
     def lefts(self):

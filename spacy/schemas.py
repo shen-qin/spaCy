@@ -255,8 +255,8 @@ class TokenPattern(BaseModel):
     like_num: Optional[StrictBool] = None
     like_url: Optional[StrictBool] = None
     like_email: Optional[StrictBool] = None
-    is_doc_start: Optional[StrictBool] = None
-    is_doc_end: Optional[StrictBool] = None
+    is_first_token: Optional[StrictBool] = None
+    is_last_token: Optional[StrictBool] = None
     op: Optional[TokenPatternOperator] = None
     underscore: Optional[Dict[StrictStr, UnderscoreValue]] = Field(None, alias="_")
 

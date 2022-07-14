@@ -8,7 +8,7 @@ from ..attrs cimport attr_id_t
 
 
 cdef attr_t get_token_attr(const TokenC* token, attr_id_t feat_name) nogil
-cdef attr_t get_token_attr_for_matcher(const TokenC* token, attr_id_t feat_name) nogil
+cdef attr_t get_token_attr_for_matcher(const TokenC* token, attr_id_t feat_name, int idx=*, int final_idx=*) nogil
 
 
 ctypedef const LexemeC* const_Lexeme_ptr
