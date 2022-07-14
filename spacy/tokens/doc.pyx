@@ -25,7 +25,7 @@ from ..lexeme cimport Lexeme, EMPTY_LEXEME
 from ..typedefs cimport attr_t, flags_t
 from ..attrs cimport attr_id_t
 from ..attrs cimport LENGTH, POS, LEMMA, TAG, MORPH, DEP, HEAD, SPACY, ENT_IOB
-from ..attrs cimport ENT_TYPE, ENT_ID, ENT_KB_ID, SENT_START, IDX, NORM, IS_DOC_START, IS_DOC_END
+from ..attrs cimport ENT_TYPE, ENT_ID, ENT_KB_ID, SENT_START, IDX, NORM, IS_FIRST_TOKEN, IS_LAST_TOKEN
 
 from ..attrs import intify_attr, IDS
 from ..compat import copy_reg, pickle
@@ -90,9 +90,9 @@ cdef attr_t get_token_attr_for_matcher(const TokenC* token, attr_id_t feat_name,
             return True
         else:
             return False
-    if feat_name == IS_DOC_START:
+    if feat_name == IS_FIRST_TOKEN:
         return idx == 0
-    if feat_name == IS_DOC_END:
+    if feat_name == IS_LAST_TOKEN:
         return idx == final_idx
     else:
         return get_token_attr(token, feat_name)

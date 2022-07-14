@@ -676,31 +676,19 @@ cdef action_t get_action(PatternStateC state,
           return RETRY
 
 
-cdef int8_t get_is_match(PatternStateC state,
-        const TokenC* token, const attr_t* extra_attrs,
-        const int8_t* predicate_matches, int idx, int final_idx) nogil:
+cdef int8_t get_is_match(PatternStateC state, const TokenC* token, const attr_t* extra_attrs,
+                         const int8_t* predicate_matches, int idx, int final_idx) nogil:
     for i in range(state.pattern.nr_py):
         if predicate_matches[state.pattern.py_predicates[i]] == -1:
             return 0
-    with gil:
-        print("predicate matches passed")
     spec = state.pattern
     if spec.nr_attr > 0:
         for attr in spec.attrs[:spec.nr_attr]:
-
-            # with gil:
-            #     print("SPEC.NR_ATTR", spec.nr_attr)
-            #     print("get_token_attr_for_matcher",get_token_attr_for_matcher(token, attr.attr))
-            #     print("attr.value", attr.value)
             if get_token_attr_for_matcher(token, attr.attr, idx, final_idx) != attr.value:
                 return 0
-    with gil:
-        print("get_token_attr_for_matcher passed")
     for i in range(spec.nr_extra_attr):
         if spec.extra_attrs[i].value != extra_attrs[spec.extra_attrs[i].index]:
             return 0
-    with gil:
-        print("extra_attrs passed")
     return True
 
 
@@ -781,7 +769,6 @@ def _preprocess_pattern(token_specs, vocab, extensions_table, extra_predicates):
     """
     tokens = []
     string_store = vocab.strings
-    # print(len(token_specs))
     for token_idx, spec in enumerate(token_specs):
         if not spec:
             # Signifier for 'any token'

@@ -96,6 +96,7 @@ cdef class Token:
         elif feat_name == SENT_START:
             token.sent_start = value
 
+
     @staticmethod
     cdef inline int missing_dep(const TokenC* token) nogil:
         return token.dep == MISSING_DEP
